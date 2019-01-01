@@ -36,6 +36,12 @@ Note that you can get paragraphs by paragraph id:
 pars = API.get_paragraphs(paragrap_id=ids)
 ```
 
+if you have memory limit, you can use Paragraph_Object = False to return only paragrap sentences instead of Paragraph Object.
+
+```python
+pars = API.get_paragraphs(Paragraph_Object=False)
+```
+
 ### Paragraph
 Paragraph is a class for working with paragraph easily. it contains, some id (id, next_id, prev_id, book_id) if they exist, tags and text. in order to get text you can use 3 different properties.
 * Paragraph.sentences return a list of list. each list is the list of words of a sentence.
