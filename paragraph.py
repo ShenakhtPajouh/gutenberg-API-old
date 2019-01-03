@@ -31,11 +31,6 @@ class Paragraph(object):
         return self._id
 
     @property
-    def text(self):
-        text = sum(self._text, [])
-        return " ".join(text)
-
-    @property
     def has_book(self):
         return self._book_id is not None
 
@@ -78,13 +73,41 @@ class Paragraph(object):
     def metadata(self):
         return paragraph_metadata(self.id, self.book_id, self.prev_id, self.next_id, self.tags)
 
-    @property
-    def sentences(self):
-        return [[word for word in sent] for sent in self._text]
+    def text(self, format="sentences", lowercase=False):
+        """
 
-    @property
-    def words(self):
-        return sum(self._text, [])
+        Return the text of Paragraphs
+
+        Args:
+            format: if it is "sentences" then the output will be a list of lists each list contain the tokens of a sentence.
+                    if it is "words" then the output will be the list of tokens.
+                    if it is "text" then the output will be a string; the text of paragraph
+            lowercase: a boolean. if it is true then the output will be lowercase
+
+        Returns:
+            depend on format, a list of strings, a list of lists of strings or a string
+
+        """
+        if format == "sentences":
+            if lowercase:
+                return [[word.lower() for word in sent] for sent in self._text]
+            else:
+                return [[word for word in sent] for sent in self._text]
+        elif format == "words":
+            words = sum([sent for sent in self._text], [])
+            if lowercase:
+                return [word.lower() for word in words]
+            else:
+                return words
+        elif format == "text":
+            words = sum([sent for sent in self._text], [])
+            text = " ".join(words)
+            if lowercase:
+                return text.lowercase()
+            else:
+                return text
+        else:
+            raise ValueError('format should be one of ["sentences", "words", "text"]')
 
 
 def create_paragraphs(paragraph_metadata, paragraph_text):
@@ -102,13 +125,13 @@ def create_paragraphs(paragraph_metadata, paragraph_text):
     return dict(pars)
 
 
-def paragraph_metadata(id=None, book_id=None, prev_id=None, next_id=None,tags=None):
+def paragraph_metadata(id=None, book_id=None, prev_id=None, next_id=None, tags=None):
     """
 
     A helper for creating metadata
 
     Args:
-        id, book_id, prev_id, next_id, are integers. tags is integer or list, set or ... of integers.
+        id, book_id, prev_id, next_id, are integers. tags is either integer or list, set and ... of integers.
         if one of them is None, it will be ignored in return
 
     Returns:
