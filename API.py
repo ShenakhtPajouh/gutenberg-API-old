@@ -113,7 +113,7 @@ def get_paragraphs(paragraph_id=None, books=None, tags=None, num_sequential=1, P
     if Paragraph_Object:
         return pars2
     if num_sequential > 1:
-        pars2 = [(par.sentences for par in pt) for pt in pars2]
+        pars2 = [tuple([par.sentences for par in pt]) for pt in pars2]
     else:
         pars2 = [par.sentences for par in pars2]
     return pars2
