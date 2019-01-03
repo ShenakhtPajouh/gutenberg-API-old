@@ -70,7 +70,9 @@ def get_paragraphs(paragraph_id=None, books=None, tags=None, num_sequential=1, P
     Args:
         paragraph_id: (Optional) a list of ints
         books: (Optional) a list of books id or GutenbergBooks
-        tags: (Optional) a list of tags
+        tags: (Optional) a list of tags. if an element of list is a set,
+              list or ... it means the tag should be at least one of those tags. for instance tags = [3, {4, 5}]
+              means that paragraphs with tag 3 and 4 or 5
         num_sequential: the number of sequential paragraphs
         Paragraph_Object: if it is True outputs will be type of Paragraph
 
@@ -91,9 +93,14 @@ def get_paragraphs(paragraph_id=None, books=None, tags=None, num_sequential=1, P
         books = {i for i in books if isinstance(i, int)} | {book.id for book in books if isinstance(book, GutenbergBook)}
         pars = {i: par for i, par in pars.items() if par.book_id in books}
     if tags is not None:
-        pars = {i: par for i, par in pars.items() if par.tags.issuperset(tags)}
+        tags = [{tag} for tag in tags if isinstance(tag, int)] + [set(tag) for tag in tags if not isinstance(tag, int)]
+        pars = {i: par for i, par in pars.items() if all([not par.tags.isdisjoint(tag) for tag in tags])}
+
     if num_sequential == 1:
-        return list(pars.values())
+        if Paragraph_Object:
+            return list(pars.values())
+        else:
+            return [par.sentences for par in pars.values()]
     assert num_sequential > 1
     pars2 = []
     for par in pars.values():
@@ -112,8 +119,5 @@ def get_paragraphs(paragraph_id=None, books=None, tags=None, num_sequential=1, P
             pars2.append(tuple(pp))
     if Paragraph_Object:
         return pars2
-    if num_sequential > 1:
-        pars2 = [tuple([par.sentences for par in pt]) for pt in pars2]
     else:
-        pars2 = [par.sentences for par in pars2]
-    return pars2
+        return [tuple(par.sentences for par in pt) for pt in pars2]
