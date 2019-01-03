@@ -83,7 +83,7 @@ def get_paragraphs(paragraph_id=None, books=None, tags=None, num_sequential=1, P
     with open(HP.PARAGRAPH_METADATA_PATH, "rb") as pkl:
         met_data = pickle.load(pkl)
     with open(HP.PARAGRAPH_DATA_PATH, "rb") as pkl:
-        text = pickle.load(pkl)
+        text = pickle.load(pkl, encoding='latin1')
     pars = create_paragraphs(met_data, text)
     if paragraph_id is not None:
         pars = {i: par for i, par in pars.items() if par.id in paragraph_id}
@@ -93,7 +93,7 @@ def get_paragraphs(paragraph_id=None, books=None, tags=None, num_sequential=1, P
     if tags is not None:
         pars = {i: par for i, par in pars.items() if par.tags.issuperset(tags)}
     if num_sequential == 1:
-        return pars.values()
+        return list(pars.values())
     assert num_sequential > 1
     pars2 = []
     for par in pars.values():
@@ -117,19 +117,3 @@ def get_paragraphs(paragraph_id=None, books=None, tags=None, num_sequential=1, P
     else:
         pars2 = [par.sentences for par in pars2]
     return pars2
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
